@@ -1,0 +1,1 @@
+# This file initializes the events module. It can contain event-related functions or classes that handle various Discord events.
