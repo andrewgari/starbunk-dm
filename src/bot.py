@@ -2,6 +2,10 @@ from discord import Bot
 from commands import example_command
 from events import on_ready
 import config
+from database.database import initialize_database # Import the initializer
+
+# Initialize the database
+initialize_database()
 
 # Initialize the bot with the specified command prefix
 bot = Bot(command_prefix=config.PREFIX)
