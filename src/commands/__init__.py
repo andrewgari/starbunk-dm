@@ -1,0 +1,1 @@
+# This file initializes the commands module. It can contain command-related functions or classes that define the bot's commands.

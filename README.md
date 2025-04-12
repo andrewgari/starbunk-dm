@@ -1,45 +1,53 @@
-# Discord Bot
+# Discord Bot Project
 
-A basic Discord bot built with discord.py.
+This project is a Discord bot built using Python. It utilizes the `discord.py` library to interact with the Discord API and provides a framework for creating commands and handling events.
 
-## Setup
+## Project Structure
 
-1. Install the required dependencies:
-```bash
-pip install -r requirements.txt
+```
+discord-bot-project
+├── src
+│   ├── bot.py                # Main entry point for the bot
+│   ├── commands              # Directory for command-related files
+│   │   ├── __init__.py       # Initializes the commands module
+│   │   └── example_command.py # Example command definition
+│   ├── events                # Directory for event-related files
+│   │   ├── __init__.py       # Initializes the events module
+│   │   └── on_ready.py       # Event handler for the on_ready event
+│   ├── utils                 # Directory for utility functions
+│   │   └── __init__.py       # Initializes the utils module
+│   └── config.py             # Configuration settings for the bot
+├── requirements.txt           # Lists project dependencies
+└── README.md                  # Project documentation
 ```
 
-2. Create a Discord application and bot:
-   - Go to the [Discord Developer Portal](https://discord.com/developers/applications)
-   - Create a new application
-   - Go to the "Bot" section and create a new bot
-   - Copy the bot token
+## Setup Instructions
 
-3. Configure the bot:
-   - Copy your bot token
-   - Open the `.env` file
-   - Replace `your_bot_token_here` with your actual bot token
+1. **Clone the repository:**
+   ```
+   git clone <repository-url>
+   cd discord-bot-project
+   ```
 
-4. Invite the bot to your server:
-   - Go to the "OAuth2" section in the Developer Portal
-   - Select "bot" under "Scopes"
-   - Select the required permissions (at minimum: "Send Messages", "Read Message History")
-   - Copy the generated URL and open it in your browser
-   - Select a server to invite the bot to
+2. **Install dependencies:**
+   Ensure you have Python installed, then run:
+   ```
+   pip install -r requirements.txt
+   ```
 
-## Running the Bot
+3. **Configure the bot:**
+   Open `src/config.py` and set your Discord bot token and command prefix.
 
-To start the bot, run:
-```bash
-python bot.py
-```
+4. **Run the bot:**
+   Execute the following command:
+   ```
+   python src/bot.py
+   ```
 
-## Basic Commands
+## Usage Guidelines
 
-- `!ping` - Check the bot's latency
+- Add commands in the `src/commands` directory.
+- Handle events in the `src/events` directory.
+- Use utility functions from the `src/utils` directory as needed.
 
-## Features
-
-- Basic command handling
-- Server connection logging
-- Latency checking
+For more information on how to use the `discord.py` library, refer to the official documentation: [discord.py Documentation](https://discordpy.readthedocs.io/en/stable/).
