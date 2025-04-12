@@ -1,3 +1,11 @@
 discord.py
 dotenv
 requests
+flake8
+black
+mypy
+pylint
+pytest
+pytest-cov
+pytest-asyncio
+pytest-mock
