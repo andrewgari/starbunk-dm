@@ -60,9 +60,6 @@ class DataManager:
             if conn:
                 conn.close()
 
-    # Add other data access methods here as needed
-    # e.g., get_all_users, delete_user, etc.
-
 # Provide a way to access the singleton instance
 def get_data_manager():
     """Returns the singleton instance of the DataManager."""
