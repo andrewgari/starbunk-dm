@@ -68,9 +68,16 @@ def add_or_update_user(user_id, username):
             conn.close()
 # Example function to get user info
 def get_user(user_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    user = cursor.fetchone()
-    conn.close()
-    return user
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        user = cursor.fetchone()
+        return user
+    except sqlite3.Error as e:
+        print(f"Error retrieving user: {e}")
+        raise
+    finally:
+        if conn:
+            conn.close()
