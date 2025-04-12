@@ -1,7 +1,8 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3-slim
+FROM python:latest
 
-EXPOSE 5002
+# Remove unnecessary EXPOSE for a Discord bot
+# EXPOSE 5002
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -21,5 +22,5 @@ COPY . /app
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["gunicorn", "--bind", "0.0.0.0:5002", "src.bot:app"]
+# Run the bot script directly using Python
+CMD ["python", "src/bot.py"]
