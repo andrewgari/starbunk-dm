@@ -1,82 +1,69 @@
 import sqlite3
 import os
+import threading
 from config import DATABASE_PATH
 
-def initialize_database():
-    """Initializes the database connection and creates tables if they don't exist.
-    
-    This function ensures that the directory for the database exists, connects to the 
-    SQLite database, creates the necessary tables (e.g., users), and closes the connection.
-    
-    Parameters:
-        None
-    
-    Returns:
-        None
-    
-    Exceptions:
-        Raises exceptions related to file handling or database connection issues.
-    """
-    try:
-        os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
-        
-        conn = sqlite3.connect(DATABASE_PATH)
-        cursor = conn.cursor()
+class DataManager:
+    _instance = None
+    _lock = threading.Lock()
 
-        # Create users table
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            user_id INTEGER PRIMARY KEY,
-            username TEXT NOT NULL,
-            first_seen TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-        """)
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            with cls._lock:
+                # Another thread could have created the instance
+                # before we acquired the lock. So check that the
+                # instance is still nonexistent.
+                if not cls._instance:
+                    cls._instance = super(DataManager, cls).__new__(cls)
+                    cls._instance._initialized = False
+        return cls._instance
 
-        conn.commit()
-        conn.close()
-        print(f"Database initialized at {DATABASE_PATH}")
-    except Exception as e:
-        print(f"Error initializing database: {e}")
-        raise
-def get_db_connection():
-    """Returns a connection object to the database."""
-    conn = sqlite3.connect(DATABASE_PATH)
-    conn.row_factory = sqlite3.Row # Return rows as dictionary-like objects
-    return conn
+    def __init__(self):
+        """Initializes the DataManager singleton instance."""
+        if hasattr(self, '_initialized') and self._initialized:
+             return
+        with self._lock:
+            if hasattr(self, '_initialized') and self._initialized:
+                return
+            self._initialize_database()
+            self._initialized = True
 
-# Example function to add or update a user
-def add_or_update_user(user_id, username):
-    conn = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-        INSERT INTO users (user_id, username)
-        VALUES (?, ?)
-        ON CONFLICT(user_id) DO UPDATE SET
-            username = excluded.username
-        """, (user_id, username))
-        conn.commit()
-    except sqlite3.Error as e:
-        print(f"Error adding or updating user: {e}")
-        if conn:
-            conn.rollback()
-        raise
-    finally:
-        if conn:
-            conn.close()
-# Example function to get user info
-def get_user(user_id):
-    conn = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-        user = cursor.fetchone()
-        return user
-    except sqlite3.Error as e:
-        print(f"Error retrieving user: {e}")
-        raise
-    finally:
-        if conn:
-            conn.close()
+
+    def _get_db_connection(self):
+        """Returns a connection object to the database."""
+        try:
+            conn = sqlite3.connect(DATABASE_PATH)
+            conn.row_factory = sqlite3.Row # Return rows as dictionary-like objects
+            return conn
+        except sqlite3.Error as e:
+            print(f"Error connecting to database: {e}")
+            raise
+
+    def _initialize_database(self):
+        """Initializes the database connection and ensures the database file exists.
+
+        This function ensures that the directory for the database exists and connects to the
+        SQLite database file, creating it if necessary. Table creation is handled separately.
+        """
+        conn = None
+        try:
+            os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
+            # Connect to the database (this will create the file if it doesn't exist)
+            conn = self._get_db_connection()
+
+            conn.commit() # Commit any changes if schema modifications were made (though none are here now)
+            print(f"Database checked/initialized at {DATABASE_PATH}")
+        except Exception as e:
+            print(f"Error initializing database: {e}")
+            raise
+        finally:
+            if conn:
+                conn.close()
+
+    # Add other data access methods here as needed
+    # e.g., get_all_users, delete_user, etc.
+
+# Provide a way to access the singleton instance
+def get_data_manager():
+    """Returns the singleton instance of the DataManager."""
+    return DataManager()
