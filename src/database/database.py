@@ -47,17 +47,25 @@ def get_db_connection():
 
 # Example function to add or update a user
 def add_or_update_user(user_id, username):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-    INSERT INTO users (user_id, username)
-    VALUES (?, ?)
-    ON CONFLICT(user_id) DO UPDATE SET
-        username = excluded.username
-    """, (user_id, username))
-    conn.commit()
-    conn.close()
-
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO users (user_id, username)
+        VALUES (?, ?)
+        ON CONFLICT(user_id) DO UPDATE SET
+            username = excluded.username
+        """, (user_id, username))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error adding or updating user: {e}")
+        if conn:
+            conn.rollback()
+        raise
+    finally:
+        if conn:
+            conn.close()
 # Example function to get user info
 def get_user(user_id):
     conn = get_db_connection()
