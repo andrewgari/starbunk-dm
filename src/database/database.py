@@ -177,17 +177,31 @@ class DataManager:
         allowed_fields = {'name', 'avatar_url', 'type', 'player_id', 'campaign_id'}
         fields = []
         values = []
+
         for k, v in kwargs.items():
             if k in allowed_fields:
+                # convert enum to its raw value so the DB check constraint isn’t violated
+                if k == "type" and isinstance(v, CharacterType):
+                    v = v.value
                 fields.append(f"{k} = ?")
                 values.append(v)
+            # else: silently ignore unknown keys
+
+        # now fail fast if any completely unknown fields were passed in
+        if any(k not in allowed_fields for k in kwargs):
+            unknown = {k for k in kwargs if k not in allowed_fields}
+            raise ValueError(f"Unknown field(s) for update: {', '.join(unknown)}")
+
         if not fields:
             return False
+
         values.append(character_id)
         conn = self._get_db_connection()
         cursor = conn.cursor()
         cursor.execute(f'''
-            UPDATE Character SET {', '.join(fields)}, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+            UPDATE Character
+               SET {', '.join(fields)}, updated_at = CURRENT_TIMESTAMP
+             WHERE id = ?
         ''', values)
         conn.commit()
         conn.close()
