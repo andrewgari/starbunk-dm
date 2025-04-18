@@ -1,9 +1,6 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
 FROM python:latest
 
-# Remove unnecessary EXPOSE for a Discord bot
-# EXPOSE 5002
-
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
 
