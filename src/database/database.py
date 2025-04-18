@@ -96,11 +96,20 @@ class DataManager:
     def create_player(self, name, member_id, guild_id, channel_id, type_):
         if isinstance(type_, PlayerType):
             type_str = type_.value
-        else:
+        elif str(type_) in (t.value for t in PlayerType):
             type_str = str(type_)
-        if not (validate_discord_id(member_id) and validate_discord_id(guild_id) and validate_discord_id(channel_id)):
+        else:
+            raise ValueError(f"Invalid PlayerType: {type_}")
+
+        if not (
+            validate_discord_id(member_id)
+            and validate_discord_id(guild_id)
+            and validate_discord_id(channel_id)
+        ):
             raise ValueError("Invalid Discord ID(s) for player.")
+
         conn = self._get_db_connection()
+        # …rest of method…
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO Player (name, member_id, guild_id, channel_id, type)
