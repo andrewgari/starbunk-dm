@@ -128,8 +128,10 @@ class DataManager:
     def create_character(self, name, avatar_url, type_, player_id, campaign_id):
         if isinstance(type_, CharacterType):
             type_str = type_.value
-        else:
+        elif str(type_) in (t.value for t in CharacterType):
             type_str = str(type_)
+        else:
+            raise ValueError(f"Invalid CharacterType: {type_}")
         conn = self._get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''
