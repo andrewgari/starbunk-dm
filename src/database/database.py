@@ -189,6 +189,8 @@ class DataManager:
 
         for k, v in kwargs.items():
             if k in allowed_fields:
+                if k == 'type' and isinstance(v, CharacterType):
+                    v = v.value
                 # convert enum to its raw value so the DB check constraint isn’t violated
                 if k == "type" and isinstance(v, CharacterType):
                     v = v.value
